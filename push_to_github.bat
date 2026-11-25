@@ -1,42 +1,25 @@
 @echo off
-title Push Production Code to GitHub
+title Push Production Code to GitHub (watermark-remover)
 cls
 echo ========================================================
 echo  SHIELDCLEAN AI - PUSH PRODUCTION BUILD TO GITHUB
 echo ========================================================
 echo.
-echo Yeh script aapke GitHub repo me purana code hatakar
-echo naye Production Vercel code ko push karega.
+echo Repository: https://github.com/thesanjeet001/watermark-remover.git
+echo Target Branch: main
 echo.
 
-set PATH=%PATH%;C:\Users\Admin\.local\mingit\cmd
+set PATH=C:\Users\Admin\.local\mingit\cmd;C:\Users\Admin\.local\mingit\bin;C:\Users\Admin\.local\mingit\mingw64\bin;%PATH%
 
-REM Check if remote already exists
-git remote get-url origin >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
-    echo Current GitHub Remote:
-    git remote -v
-    echo.
-    set /p CONFIRM="Isi remote par push karein? (Y/N, default Y): "
-    if /i "%CONFIRM%"=="N" (
-        set /p NEW_URL="Naya GitHub Repo URL daalein: "
-        git remote set-url origin %NEW_URL%
-    )
-) else (
-    echo Koi GitHub Remote set nahi hai.
-    echo.
-    set /p REPO_URL="Apne GitHub Repo ka URL daalein (e.g. https://github.com/username/repo.git): "
-    if "%REPO_URL%"=="" (
-        echo Error: Repo URL nahi diya gaya!
-        pause
-        exit /b 1
-    )
-    git remote add origin %REPO_URL%
-)
+REM Ensure origin is set
+git remote remove origin >nul 2>&1
+git remote add origin https://github.com/thesanjeet001/watermark-remover.git
 
 echo.
-echo Pushing production code to GitHub (main branch)...
+echo Pushing production code to GitHub...
+echo (Agar browser me GitHub login prompt aaye to bas "Authorize" par click karein)
 echo.
+
 git push -u origin main --force
 
 echo.
@@ -45,7 +28,7 @@ if %ERRORLEVEL% EQU 0 (
     echo [SUCCESS] Code successfully GitHub par push ho gaya!
     echo Vercel ab apne aap latest production build deploy kar dega.
 ) else (
-    echo [NOTE] Push complete nahi hua. Check karein ki GitHub login sahi hai.
+    echo [NOTE] Push complete nahi hua. Check karein ki GitHub authorization pass hui hai.
 )
 echo ========================================================
 pause
