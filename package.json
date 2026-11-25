@@ -1,0 +1,20 @@
+{
+  "name": "shieldclean-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ShieldClean AI - Photo Sanitizer & Cleaner (Ultra Fresh HD) - Production Deployment for Vercel",
+  "scripts": {
+    "start": "npx serve .",
+    "deploy": "npx vercel --prod"
+  },
+  "keywords": [
+    "ai-image-cleaner",
+    "c2pa-purge",
+    "exif-cleaner",
+    "photo-sanitizer",
+    "pwa",
+    "privacy"
+  ],
+  "author": "ShieldClean AI",
+  "license": "MIT"
+}

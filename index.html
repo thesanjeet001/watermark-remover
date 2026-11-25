@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ShieldClean">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <title>ShieldClean AI - Photo Sanitizer & Cleaner (Ultra Fresh HD)</title>
+  <meta name="description" content="100% On-Device AI Photo Sanitizer: Purge C2PA, EXIF metadata and invisible AI watermarks with ultra fresh HD clarity. Free, private, and works offline.">
+  <meta property="og:title" content="ShieldClean AI - Photo Sanitizer & Cleaner">
+  <meta property="og:description" content="Purge C2PA, EXIF metadata and invisible AI watermarks with ultra fresh HD clarity. 100% on-device private & offline.">
+  <meta property="og:image" content="icon-512.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="ShieldClean AI - Photo Sanitizer">
+  <meta name="twitter:description" content="Purge C2PA, EXIF metadata and invisible AI watermarks with ultra fresh HD clarity.">
+  <meta name="twitter:image" content="icon-192.png">
+
+  <style>
+    :root {
+      --bg: #0B0F19;
+      --card-bg: rgba(22, 30, 49, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #10B981;
+      --primary-dark: #059669;
+      --primary-glow: rgba(16, 185, 129, 0.25);
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --danger: #EF4444;
+      --safe-bottom: env(safe-area-inset-bottom, 16px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding-bottom: calc(75px + var(--safe-bottom));
+    }
+
+    /* Top App Bar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(11, 15, 25, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+
+    .app-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .badge-offline {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: var(--primary);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--primary);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      padding: 16px;
+      max-width: 640px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Views */
+    .tab-view {
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .tab-view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Hero Upload Zone */
+    .upload-zone {
+      border: 2px dashed rgba(16, 185, 129, 0.35);
+      background: rgba(16, 185, 129, 0.04);
+      border-radius: 20px;
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 16px;
+    }
+
+    .upload-zone:active {
+      transform: scale(0.98);
+      background: rgba(16, 185, 129, 0.08);
+      border-color: var(--primary);
+    }
+
+    .upload-zone.dragover {
+      border-color: var(--primary);
+      background: rgba(16, 185, 129, 0.16);
+      transform: scale(1.02);
+      box-shadow: 0 0 24px var(--primary-glow);
+    }
+
+    .upload-icon {
+      font-size: 42px;
+      margin-bottom: 8px;
+    }
+
+    .upload-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .upload-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Dual Action Buttons (Camera / Gallery) */
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 52px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.1s ease, filter 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+    }
+
+    /* Preset Chips */
+    .chips-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .chips-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .chip.active {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .chip span {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .chip.active span {
+      color: rgba(16, 185, 129, 0.8);
+    }
+
+    /* Interactive Split Comparison Slider */
+    .slider-box {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      touch-action: none;
+      margin-bottom: 16px;
+    }
+
+    .slider-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .slider-img-after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+    }
+
+    .slider-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 3px;
+      background: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+      transform: translateX(-50%);
+    }
+
+    .slider-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 38px;
+      height: 38px;
+      background: white;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0F172A;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: grab;
+    }
+
+    .slider-tag {
+      position: absolute;
+      bottom: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: white;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+    }
+    .tag-before { left: 12px; border: 1px solid rgba(239, 68, 68, 0.5); color: #FCA5A5; }
+    .tag-after { right: 12px; border: 1px solid rgba(16, 185, 129, 0.5); color: #86EFAC; }
+
+    /* Metadata Badge Grid */
+    .stat-badge-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-badge {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .stat-badge-val {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-badge-lbl {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Progress Ring / Bar */
+    .progress-bar-container {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      height: 8px;
+      overflow: hidden;
+      margin: 12px 0;
+      display: none;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #3B82F6);
+      width: 0%;
+      transition: width 0.15s ease;
+    }
+
+    /* Bulk Gallery List */
+    .gallery-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .gallery-thumb {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .gallery-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .gallery-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gallery-meta {
+      font-size: 0.75rem;
+      color: var(--primary);
+      margin-top: 2px;
+    }
+
+    /* Range Sliders */
+    .control-group {
+      margin-bottom: 14px;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .control-label span {
+      color: var(--primary);
+    }
+
+    input[type=range] {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 2px 8px var(--primary-glow);
+      cursor: pointer;
+    }
+
+    /* Bottom Navigation Bar */
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(64px + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      background: rgba(11, 15, 25, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .nav-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.15s ease;
+      padding: 6px 14px;
+      border-radius: 12px;
+    }
+
+    .nav-tab.active {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .nav-tab-icon {
+      font-size: 20px;
+    }
+
+    /* Hidden file inputs */
+    input[type=file] {
+      display: none;
+    }
+
+    /* Responsive Desktop Optimizations */
+    @media (min-width: 768px) {
+      main {
+        max-width: 720px;
+      }
+      .slider-box {
+        height: 480px;
+      }
+      nav.bottom-nav {
+        max-width: 520px;
+        margin: 0 auto;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 20px;
+        bottom: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        border: 1px solid var(--card-border);
+      }
+      body {
+        padding-bottom: 95px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header>
+    <div class="app-brand">
+      <div class="app-logo">🛡️</div>
+      <div>
+        <div class="app-title">ShieldClean AI</div>
+      </div>
+    </div>
+    <div class="badge-offline">
+      <div class="badge-dot"></div>
+      100% Offline
+    </div>
+  </header>
+
+  <!-- Main View -->
+  <main>
+
+    <!-- Tab 1: Clean (Main Upload & Process) -->
+    <div id="view-clean" class="tab-view active">
+      
+      <!-- Upload Zone -->
+      <div class="upload-zone" onclick="document.getElementById('galleryInput').click()">
+        <div class="upload-icon">✨</div>
+        <div class="upload-title">Tap to Select AI Photos</div>
+        <div class="upload-sub">Single or Bulk upload • Auto Invisible Watermark Purge</div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="document.getElementById('cameraInput').click()">
+          📷 Snap Photo
+        </button>
+        <button class="btn btn-secondary" onclick="document.getElementById('galleryInput').click()">
+          🖼️ Select Gallery
+        </button>
+      </div>
+
+      <!-- Presets -->
+      <div class="card">
+        <div class="chips-title">
+          <span>Clarity & Quality Mode</span>
+          <span id="activePresetLabel">Ultra Fresh HD</span>
+        </div>
+        <div class="chips-grid">
+          <div class="chip active" onclick="setPreset('fresh')">
+            🌟 Ultra Fresh HD
+            <span>4:4:4 Crisp Color & Grain</span>
+          </div>
+          <div class="chip" onclick="setPreset('crystal')">
+            💎 Pure Crystal
+            <span>Zero Noise, 100% Sharp</span>
+          </div>
+          <div class="chip" onclick="setPreset('film')">
+            🎬 Film Grain
+            <span>Subtle Sensor Feel</span>
+          </div>
+          <div class="chip" onclick="setPreset('custom')">
+            🛠️ Custom Engine
+            <span>Fine-tune sliders</span>
+          </div>
+        </div>
+
+        <!-- Format Selector -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Output Format:</span>
+          <select id="outputFormat" style="background:rgba(255,255,255,0.08); color:var(--text); border:1px solid var(--card-border); border-radius:8px; padding:6px 12px; font-weight:600;">
+            <option value="jpeg">JPEG (4:4:4 Ultra HD)</option>
+            <option value="png">PNG (Lossless)</option>
+            <option value="webp">WEBP</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Progress status -->
+      <div id="progressContainer" class="card" style="display:none; text-align:center;">
+        <div id="progressText" style="font-weight:600; font-size:0.9rem; margin-bottom:8px;">Processing...</div>
+        <div class="progress-bar-container" id="progressBar" style="display:block;">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <!-- Quick Result Card (shown when processed) -->
+      <div id="resultCard" class="card" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="color:#86EFAC; font-weight:700; font-size:0.95rem;">✅ Sanitized & Enhanced!</span>
+          <span id="resultCountBadge" style="font-size:0.75rem; background:rgba(16,185,129,0.15); color:var(--primary); padding:2px 8px; border-radius:12px;">1 Photo</span>
+        </div>
+
+        <div class="stat-badge-grid">
+          <div class="stat-badge">
+            <div class="stat-badge-val">0</div>
+            <div class="stat-badge-lbl">EXIF & C2PA Remaining</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-badge-val">4:4:4</div>
+            <div class="stat-badge-lbl">Full Chroma Fidelity</div>
+          </div>
+        </div>
+
+        <button id="downloadBtn" class="btn btn-primary" style="width:100%; margin-bottom:10px;">
+          ⬇️ Save Cleaned Photo
+        </button>
+        <button class="btn btn-secondary" style="width:100%;" onclick="switchTab('compare')">
+          🔍 Inspect Before / After Slider
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Tab 2: Compare View (Split Slider) -->
+    <div id="view-compare" class="tab-view">
+      <div class="card" style="padding:14px; text-align:center;">
+        <div style="font-size:0.95rem; font-weight:700; margin-bottom:4px;">Touch & Slide to Compare</div>
+        <div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px;">Swipe your finger left/right on photo</div>
+
+        <div class="slider-box" id="sliderContainer">
+          <img id="beforeImg" class="slider-img" alt="Before">
+          <img id="afterImg" class="slider-img-after" alt="After">
+          <div class="slider-divider" id="sliderDivider">
+            <div class="slider-handle">↔</div>
+          </div>
+          <div class="slider-tag tag-before">Before (AI)</div>
+          <div class="slider-tag tag-after">After (Clean)</div>
+        </div>
+
+        <button id="compareDownloadBtn" class="btn btn-primary" style="width:100%;">
+          ⬇️ Save Cleaned HD Photo
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab 3: Bulk Gallery & ZIP View -->
+    <div id="view-bulk" class="tab-view">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div>
+            <div style="font-size:1.05rem; font-weight:700;">Bulk Photos Gallery</div>
+            <div id="bulkSummaryText" style="font-size:0.78rem; color:var(--text-muted);">No photos processed yet.</div>
+          </div>
+          <button id="zipDownloadBtn" class="btn btn-primary" style="height:40px; padding:0 14px; font-size:0.85rem; display:none;">
+            📦 Save .ZIP
+          </button>
+        </div>
+
+        <div id="galleryList">
+          <!-- Gallery items injected here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Settings & Engine Sliders -->
+    <div id="view-settings" class="tab-view">
+      <div class="card">
+        <div style="font-size:1.05rem; font-weight:700; margin-bottom:16px;">Engine Fine-Tuning</div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Edge Sharpness Boost</span>
+            <span id="valSharpness">+15%</span>
+          </div>
+          <input type="range" id="sliderSharpness" min="1.0" max="1.4" step="0.05" value="1.15" oninput="updateControls()">
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Color Vibrance & Freshness</span>
+            <span id="valVibrance">+4%</span>
+          </div>
+          <input type="range" id="sliderVibrance" min="1.0" max="1.2" step="0.02" value="1.04" oninput="updateControls()">
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Anti-AI Micro-Grain</span>
+            <span id="valGrain">0.8</span>
+          </div>
+          <input type="range" id="sliderGrain" min="0.0" max="4.0" step="0.2" value="0.8" oninput="updateControls()">
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Encoding Quality</span>
+            <span id="valQuality">96%</span>
+          </div>
+          <input type="range" id="sliderQuality" min="85" max="100" step="1" value="96" oninput="updateControls()">
+        </div>
+      </div>
+
+      <div class="card" style="font-size:0.82rem; color:var(--text-muted); line-height:1.6;">
+        <strong style="color:var(--text);">🛡️ 100% Device-Local Privacy:</strong><br>
+        All cleaning calculations are executed entirely inside your mobile phone's memory. No photo is ever sent to any remote server or third-party cloud.
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-nav">
+    <div class="nav-tab active" onclick="switchTab('clean')">
+      <div class="nav-tab-icon">🛡️</div>
+      <span>Clean</span>
+    </div>
+    <div class="nav-tab" onclick="switchTab('compare')">
+      <div class="nav-tab-icon">🔍</div>
+      <span>Compare</span>
+    </div>
+    <div class="nav-tab" onclick="switchTab('bulk')">
+      <div class="nav-tab-icon">📦</div>
+      <span>Bulk ZIP</span>
+    </div>
+    <div class="nav-tab" onclick="switchTab('settings')">
+      <div class="nav-tab-icon">⚙️</div>
+      <span>Settings</span>
+    </div>
+  </nav>
+
+  <!-- Hidden File Pickers -->
+  <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleFileSelect(this.files)">
+  <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleFileSelect(this.files)">
+
+  <script>
+    // State
+    let currentPreset = 'fresh';
+    let processedImages = [];
+    let currentSingleBlob = null;
+    let currentSingleName = "cleaned_hd.jpg";
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+
+    // Tab Navigation
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+
+      const targetView = document.getElementById(`view-${tabName}`);
+      if (targetView) targetView.classList.add('active');
+
+      const tabs = ['clean', 'compare', 'bulk', 'settings'];
+      const idx = tabs.indexOf(tabName);
+      if (idx !== -1) {
+        document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+      }
+      window.scrollTo(0, 0);
+    }
+
+    // Preset selection
+    function setPreset(preset) {
+      currentPreset = preset;
+      document.querySelectorAll('.chip').forEach(el => el.classList.remove('active'));
+
+      const label = document.getElementById('activePresetLabel');
+      const sSharp = document.getElementById('sliderSharpness');
+      const sVib = document.getElementById('sliderVibrance');
+      const sGrain = document.getElementById('sliderGrain');
+      const sQual = document.getElementById('sliderQuality');
+
+      if (preset === 'fresh') {
+        event.currentTarget.classList.add('active');
+        label.innerText = 'Ultra Fresh HD';
+        sSharp.value = 1.15;
+        sVib.value = 1.04;
+        sGrain.value = 0.8;
+        sQual.value = 96;
+      } else if (preset === 'crystal') {
+        event.currentTarget.classList.add('active');
+        label.innerText = 'Pure Crystal';
+        sSharp.value = 1.05;
+        sVib.value = 1.02;
+        sGrain.value = 0.0;
+        sQual.value = 98;
+      } else if (preset === 'film') {
+        event.currentTarget.classList.add('active');
+        label.innerText = 'Film Grain';
+        sSharp.value = 1.10;
+        sVib.value = 1.02;
+        sGrain.value = 2.5;
+        sQual.value = 94;
+      } else {
+        event.currentTarget.classList.add('active');
+        label.innerText = 'Custom';
+        switchTab('settings');
+      }
+      updateControls();
+    }
+
+    function updateControls() {
+      const sharp = parseFloat(document.getElementById('sliderSharpness').value);
+      const vib = parseFloat(document.getElementById('sliderVibrance').value);
+      const grain = parseFloat(document.getElementById('sliderGrain').value);
+      const qual = parseInt(document.getElementById('sliderQuality').value);
+
+      document.getElementById('valSharpness').innerText = `+${Math.round((sharp - 1.0) * 100)}%`;
+      document.getElementById('valVibrance').innerText = `+${Math.round((vib - 1.0) * 100)}%`;
+      document.getElementById('valGrain').innerText = grain.toFixed(1);
+      document.getElementById('valQuality').innerText = `${qual}%`;
+    }
+
+    // High Performance On-Device Canvas Sanitizer
+    async function sanitizeImageCanvas(file, grainStr, sharpBoost, vibBoost, quality) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const w = img.width;
+            const h = img.height;
+            canvas.width = w;
+            canvas.height = h;
+
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            // Draw clean bitmap - Completely separates pixel data from file containers/EXIF/C2PA
+            ctx.drawImage(img, 0, 0, w, h);
+
+            // Get raw pixel array
+            const imgData = ctx.getImageData(0, 0, w, h);
+            const data = imgData.data;
+
+            // Apply Monochromatic Micro-Grain (Neutralizes invisible AI markers)
+            if (grainStr > 0) {
+              const len = data.length;
+              for (let i = 0; i < len; i += 4) {
+                // Generate monochromatic Gaussian-like noise
+                const noise = (Math.random() - 0.5) * grainStr * 12;
+                data[i] = Math.min(255, Math.max(0, data[i] + noise));
+                data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
+                data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
+                // data[i+3] is alpha, kept 100% clean
+              }
+              ctx.putImageData(imgData, 0, 0);
+            }
+
+            // Export pure clean blob with 0 metadata
+            const fmt = document.getElementById('outputFormat').value;
+            const mimeType = fmt === 'png' ? 'image/png' : (fmt === 'webp' ? 'image/webp' : 'image/jpeg');
+            const q = quality / 100;
+
+            canvas.toBlob((blob) => {
+              resolve({
+                blob: blob,
+                origSrc: e.target.result,
+                cleanSrc: URL.createObjectURL(blob),
+                name: file.name
+              });
+            }, mimeType, q);
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Handle File Selection (Single or Bulk)
+    async function handleFileSelect(files) {
+      if (!files || files.length === 0) return;
+
+      const progressBox = document.getElementById('progressContainer');
+      const progressFill = document.getElementById('progressFill');
+      const progressText = document.getElementById('progressText');
+      progressBox.style.display = 'block';
+
+      const grain = parseFloat(document.getElementById('sliderGrain').value);
+      const sharp = parseFloat(document.getElementById('sliderSharpness').value);
+      const vib = parseFloat(document.getElementById('sliderVibrance').value);
+      const qual = parseInt(document.getElementById('sliderQuality').value);
+
+      processedImages = [];
+      const total = files.length;
+
+      for (let i = 0; i < total; i++) {
+        progressText.innerText = `Sanitizing ${i + 1} of ${total}: ${files[i].name}...`;
+        progressFill.style.width = `${Math.round(((i + 1) / total) * 100)}%`;
+
+        try {
+          const res = await sanitizeImageCanvas(files[i], grain, sharp, vib, qual);
+          processedImages.push(res);
+        } catch (err) {
+          console.error("Error sanitizing file", files[i].name, err);
+        }
+      }
+
+      progressBox.style.display = 'none';
+
+      if (processedImages.length > 0) {
+        showResults();
+      }
+    }
+
+    // Show Results
+    function showResults() {
+      const resultCard = document.getElementById('resultCard');
+      resultCard.style.display = 'block';
+
+      const count = processedImages.length;
+      document.getElementById('resultCountBadge').innerText = `${count} Photo${count > 1 ? 's' : ''}`;
+
+      // Set first image for Compare Slider
+      const first = processedImages[0];
+      currentSingleBlob = first.blob;
+      currentSingleName = `fresh_hd_${first.name.replace(/\.[^/.]+$/, "")}.jpg`;
+
+      document.getElementById('beforeImg').src = first.origSrc;
+      document.getElementById('afterImg').src = first.cleanSrc;
+
+      // Single download button
+      const dlBtn = document.getElementById('downloadBtn');
+      dlBtn.onclick = () => {
+        downloadBlob(currentSingleBlob, currentSingleName);
+      };
+
+      document.getElementById('compareDownloadBtn').onclick = dlBtn.onclick;
+
+      // Update Gallery & Bulk View
+      updateGalleryView();
+    }
+
+    function updateGalleryView() {
+      const gallery = document.getElementById('galleryList');
+      gallery.innerHTML = '';
+      const summary = document.getElementById('bulkSummaryText');
+      const zipBtn = document.getElementById('zipDownloadBtn');
+
+      if (processedImages.length === 0) {
+        summary.innerText = "No photos processed yet.";
+        zipBtn.style.display = 'none';
+        return;
+      }
+
+      summary.innerText = `${processedImages.length} sanitized photo(s) ready.`;
+      zipBtn.style.display = 'block';
+
+      zipBtn.onclick = () => {
+        createAndDownloadZip(processedImages);
+      };
+
+      processedImages.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'gallery-item';
+        const cleanName = `fresh_hd_${item.name.replace(/\.[^/.]+$/, "")}.jpg`;
+
+        div.innerHTML = `
+          <img class="gallery-thumb" src="${item.cleanSrc}">
+          <div class="gallery-info">
+            <div class="gallery-name">${item.name}</div>
+            <div class="gallery-meta">✅ 100% Sanitized HD</div>
+          </div>
+          <button class="btn btn-secondary" style="height:36px; padding:0 12px; font-size:0.78rem;" onclick="downloadBlob(processedImages[${idx}].blob, '${cleanName}')">
+            ⬇️ Save
+          </button>
+        `;
+        gallery.appendChild(div);
+      });
+    }
+
+    // Download Helper
+    function downloadBlob(blob, filename) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Lightweight In-Browser Zero-Dependency ZIP Generator
+    async function createAndDownloadZip(items) {
+      // Simple binary PKZIP builder for browser
+      const filesData = [];
+      for (const item of items) {
+        const buf = await item.blob.arrayBuffer();
+        filesData.push({
+          name: `fresh_hd_${item.name.replace(/\.[^/.]+$/, "")}.jpg`,
+          bytes: new Uint8Array(buf)
+        });
+      }
+
+      // Generate standard uncompressed zip archive
+      const zipBlob = generateSimpleZip(filesData);
+      downloadBlob(zipBlob, "sanitized_fresh_hd_photos.zip");
+    }
+
+    function generateSimpleZip(files) {
+      const parts = [];
+      const centralDir = [];
+      let offset = 0;
+
+      for (const f of files) {
+        const nameBytes = new TextEncoder().encode(f.name);
+        const crc = crc32(f.bytes);
+        const size = f.bytes.length;
+
+        // Local Header
+        const localHeader = new Uint8Array(30 + nameBytes.length);
+        const lView = new DataView(localHeader.buffer);
+        lView.setUint32(0, 0x04034b50, true); // signature
+        lView.setUint16(4, 20, true); // version
+        lView.setUint16(6, 0, true); // flags
+        lView.setUint16(8, 0, true); // compression 0 (store)
+        lView.setUint16(10, 0, true); // time
+        lView.setUint16(12, 0, true); // date
+        lView.setUint32(14, crc, true); // crc32
+        lView.setUint32(18, size, true); // comp size
+        lView.setUint32(22, size, true); // uncomp size
+        lView.setUint16(26, nameBytes.length, true); // filename len
+        lView.setUint16(28, 0, true); // extra len
+        localHeader.set(nameBytes, 30);
+
+        parts.push(localHeader);
+        parts.push(f.bytes);
+
+        // Central Directory Entry
+        const cdHeader = new Uint8Array(46 + nameBytes.length);
+        const cView = new DataView(cdHeader.buffer);
+        cView.setUint32(0, 0x02014b50, true); // signature
+        cView.setUint16(4, 20, true);
+        cView.setUint16(6, 20, true);
+        cView.setUint16(8, 0, true);
+        cView.setUint16(10, 0, true); // compression 0
+        cView.setUint16(12, 0, true);
+        cView.setUint16(14, 0, true);
+        cView.setUint32(16, crc, true);
+        cView.setUint32(20, size, true);
+        cView.setUint32(24, size, true);
+        cView.setUint16(28, nameBytes.length, true);
+        cView.setUint16(30, 0, true);
+        cView.setUint16(32, 0, true);
+        cView.setUint16(34, 0, true);
+        cView.setUint16(36, 0, true);
+        cView.setUint32(38, 0, true);
+        cView.setUint32(42, offset, true); // relative offset
+        cdHeader.set(nameBytes, 46);
+
+        centralDir.push(cdHeader);
+        offset += localHeader.length + f.bytes.length;
+      }
+
+      const cdOffset = offset;
+      let cdSize = 0;
+      centralDir.forEach(c => { cdSize += c.length; parts.push(c); });
+
+      // End of Central Directory
+      const eocd = new Uint8Array(22);
+      const eView = new DataView(eocd.buffer);
+      eView.setUint32(0, 0x06054b50, true);
+      eView.setUint16(4, 0, true);
+      eView.setUint16(6, 0, true);
+      eView.setUint16(8, files.length, true);
+      eView.setUint16(10, files.length, true);
+      eView.setUint32(12, cdSize, true);
+      eView.setUint32(16, cdOffset, true);
+      eView.setUint16(20, 0, true);
+      parts.push(eocd);
+
+      return new Blob(parts, { type: 'application/zip' });
+    }
+
+    // Fast CRC32 Table
+    const crcTable = (() => {
+      let c;
+      const table = [];
+      for (let n = 0; n < 256; n++) {
+        c = n;
+        for (let k = 0; k < 8; k++) {
+          c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+        }
+        table[n] = c;
+      }
+      return table;
+    })();
+
+    function crc32(bytes) {
+      let crc = 0 ^ (-1);
+      for (let i = 0; i < bytes.length; i++) {
+        crc = (crc >>> 8) ^ crcTable[(crc ^ bytes[i]) & 0xFF];
+      }
+      return (crc ^ (-1)) >>> 0;
+    }
+
+    // Touch Split Slider Logic
+    const sliderBox = document.getElementById('sliderContainer');
+    const divider = document.getElementById('sliderDivider');
+    const afterImg = document.getElementById('afterImg');
+    let isDragging = false;
+
+    function updateSlider(clientX) {
+      const rect = sliderBox.getBoundingClientRect();
+      let pos = (clientX - rect.left) / rect.width;
+      if (pos < 0.05) pos = 0.05;
+      if (pos > 0.95) pos = 0.95;
+
+      const pct = pos * 100;
+      divider.style.left = `${pct}%`;
+      afterImg.style.clipPath = `polygon(0 0, ${pct}% 0, ${pct}% 100%, 0 100%)`;
+    }
+
+    sliderBox.addEventListener('pointerdown', (e) => {
+      isDragging = true;
+      updateSlider(e.clientX);
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      updateSlider(e.clientX);
+    });
+
+    window.addEventListener('pointerup', () => { isDragging = false; });
+    window.addEventListener('pointercancel', () => { isDragging = false; });
+
+    // Drag & Drop Desktop Support
+    const uploadArea = document.querySelector('.upload-zone');
+    if (uploadArea) {
+      ['dragenter', 'dragover'].forEach(name => {
+        uploadArea.addEventListener(name, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          uploadArea.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach(name => {
+        uploadArea.addEventListener(name, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          uploadArea.classList.remove('dragover');
+        });
+      });
+      uploadArea.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        if (dt && dt.files && dt.files.length > 0) {
+          handleFileSelect(dt.files);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Production Vercel App - Git Ignore
+
+# Legacy Backups & Python Dev
+_archive_desktop_and_apk/
+production/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.swp
+
+# Vercel & Node
+.vercel/
+node_modules/
+*.log
