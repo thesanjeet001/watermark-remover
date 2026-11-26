@@ -2,7 +2,6 @@
 
 # Legacy Backups & Python Dev
 _archive_desktop_and_apk/
-production/
 .venv/
 __pycache__/
 *.py[cod]
